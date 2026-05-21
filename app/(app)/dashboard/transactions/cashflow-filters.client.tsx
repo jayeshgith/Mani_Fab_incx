@@ -9,10 +9,11 @@ const CashFlowFiltersNoSSR = dynamic(() => import("./cashflow-filters"), {
 type Props = {
   year: number;
   yearsRange: number[];
+  mode: "month" | "week" | "day";
 };
 
-const CashFlowFiltersClient = ({ year, yearsRange }: Props) => {
-  return <CashFlowFiltersNoSSR year={year} yearsRange={yearsRange} />;
+const CashFlowFiltersClient = ({ year, yearsRange, mode }: Props) => {
+  return <CashFlowFiltersNoSSR year={year} yearsRange={yearsRange} mode={mode} />;
 };
 
 export default CashFlowFiltersClient;

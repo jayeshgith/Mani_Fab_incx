@@ -6,16 +6,24 @@ const CashFlowContentNoSSR = dynamic(() => import("./cashflow-content"), {
   ssr: false,
 });
 
-type Props = {
-  annualCashflow: {
-    month: number;
-    totalIncome: number;
-    totalExpenses: number;
-  }[];
+type CashflowData = {
+  month?: number;
+  week?: number;
+  weekLabel?: string;
+  day?: number;
+  dayLabel?: string;
+  totalIncome: number;
+  totalExpenses: number;
 };
 
-const CashFlowContentClient = ({ annualCashflow }: Props) => {
-  return <CashFlowContentNoSSR annualCashflow={annualCashflow} />;
+type Props = {
+  data: CashflowData[];
+  mode?: "month" | "week" | "day";
+  year: number;
+};
+
+const CashFlowContentClient = (props: Props) => {
+  return <CashFlowContentNoSSR {...props} />;
 };
 
 export default CashFlowContentClient;

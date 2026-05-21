@@ -22,20 +22,28 @@ import numeral from "numeral";
 import CashflowChart from "../groups/dashboard/cashflow-chart";
 import FamilyRecentTransactionsFilters from "./family-recent-transactions-filters";
 import TransactionTypeFilter from "./transaction-type-filter";
+import DashboardExportPdf from "./dashboard-export-pdf";
+
+type DashboardSearchParams = {
+  cfyear?: string;
+  cfmode?: string;
+  cfmonth?: string;
+  cfweek?: string;
+  scope?: string;
+  familyTxType?: string;
+  familyTxMonth?: string;
+  familyTxYear?: string;
+  familyTxDate?: string;
+  familyTxRange?: string;
+};
+
+type DashboardPageProps = {
+  searchParams: Promise<DashboardSearchParams>;
+};
 
 const DashboardPage = async ({
   searchParams,
-}: {
-  searchParams: Promise<{
-    cfyear?: string;
-    scope?: string;
-    familyTxType?: string;
-    familyTxMonth?: string;
-    familyTxYear?: string;
-    familyTxDate?: string;
-    familyTxRange?: string;
-  }>;
-}) => {
+}: DashboardPageProps) => {
   const params = await searchParams;
   const today = new Date();
   let cfyear = Number(
@@ -44,6 +52,10 @@ const DashboardPage = async ({
   if (!cfyear || isNaN(cfyear)) {
     cfyear = today.getFullYear();
   }
+  const cfmode: "month" | "week" | "day" =
+    params.cfmode === "week" || params.cfmode === "day" ? params.cfmode : "month";
+  const cfmonth = params.cfmonth ? Number(params.cfmonth) : undefined;
+  const cfweek = params.cfweek ? Number(params.cfweek) : undefined;
 
   const session = await auth();
   let hasOwnedGroups = false;
@@ -133,6 +145,9 @@ const DashboardPage = async ({
                 Family Dashboard
               </Link>
             </Button>
+          ) : null}
+          {!isFamilyScope ? (
+            <DashboardExportPdf scope={selectedScope} />
           ) : null}
         </div>
       </div>
@@ -241,11 +256,18 @@ const DashboardPage = async ({
         <>
           <CashFlow
             year={cfyear}
+            mode={isSocietyScope ? "month" : cfmode}
+            month={isSocietyScope ? undefined : cfmonth}
+            week={isSocietyScope ? undefined : cfweek}
             scope={isSocietyScope ? "society" : "personal"}
             title={
               isSocietyScope
                 ? "Society Transaction Cash Flow"
-                : "Personal Cash Flow"
+                : cfmode === "month"
+                  ? "Personal Cash Flow"
+                  : cfmode === "week"
+                    ? `Weekly Cash Flow`
+                    : "Daily Cash Flow"
             }
             showFilters={!isSocietyScope}
           />
